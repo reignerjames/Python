@@ -1,0 +1,206 @@
+
+from typing import *
+import re
+
+# Type hints
+BookSummary = Tuple[int,str,str]
+BookList = List[BookSummary]
+Index = Dict[str,List[BookSummary]]
+
+def make_book_list( book_string: str ) -> BookList:
+    '''
+    Parses a list of books to generate a list of book summaries.
+    See the Assignment Details page for full information.
+    ''' 
+    
+    books: BookList = [] # Creates empty list to parse book summaries
+    current = book_string # Prevents infinite loop
+    
+    while True: 
+        
+        # This loop allows multiple books to be parsed
+        # Program breaks if summary does not include full stop and colon
+        
+        # This separates the book's reference number
+        if '.' not in current: 
+            break    
+        split_reference, full_stop = current.split('.', 1)
+        reference = int(split_reference) 
+
+        # This separates the book's title
+        if ':' not in full_stop: 
+            break
+        split_title, colon = full_stop.split(':', 1)
+        title = split_title 
+        
+        # This separates the book's subtitle
+        if '.' not in colon: 
+            break
+        split_subtitle, full_stop = colon.split('.', 1)
+        subtitle = split_subtitle 
+
+        books.append((reference, title, subtitle))
+        
+        current = full_stop
+        
+    return books
+
+
+def title_length( book_summaries: BookList ) -> float:
+    '''
+    Compute the average number of words in book titles.
+    See the Assignment Details page for full information.
+    ''' 
+
+    total_words = 0
+
+    # Finds total words in title 
+    for _, title, _, in book_summaries:
+        words = re.findall('[a-z]+', title)
+        total_words += len(words)
+    
+    # Now divide total words with total books
+    return total_words / len (book_summaries)
+    
+
+def word_occurrences( book_list: BookList, query: str) -> int:
+    '''
+    Calculate the number of times the query is found in the collection.
+    See the Assignment Details page for full information.
+    '''
+    
+    word_count = 0
+    
+    # Finds and counts the input word in title & subtitle
+    for _, title, subtitle in book_list:
+        
+        title_words = re.findall('[a-z]+', title)
+        subtitle_words = re.findall('[a-z]+', subtitle)
+        word_count += title_words.count(query)
+        word_count += subtitle_words.count(query)
+    
+    return word_count
+    
+
+def make_index( book_list: BookList, field_selector: int) -> Index:
+    '''
+    Creates an index to enable efficient word search.
+    See the Assignment Details page for full information.
+    '''
+    
+    index: Index = {}
+    
+    # Sets field selector to either subtitle or title
+    for ref, title, subtitle in book_list:
+        
+        if field_selector == 1:
+            text = title
+        elif field_selector == 2: 
+            text = subtitle
+        else:
+            return {}
+        
+        # Extracts the words from the chosen field
+        tokens = re.findall('[a-z]+', text)
+        
+        for i in tokens:
+            if i not in index:
+                index[i] = []
+            index[i].append((ref, title, subtitle))
+    
+    return index
+                
+
+def search_word( book_list: BookList, book_index: Index, query: str) -> str:
+    '''
+    Gets the formatted title of every book that contains the word, as determined 
+    by the supplied index
+    See the Assignment Details page for full information.
+    '''
+    # Get query
+    tokens = re.findall('[a-z]+', query)
+    matches = book_index.get(tokens[0], [])
+    
+    lines = []
+    
+    # Built one line per matching book
+    for _, title, subtitle in matches:
+        lines.append(f'{title}: {subtitle}')
+        
+    return "\n".join(lines)
+
+def interact():
+    '''
+    Implements the interactive user interface to meet requirements laid out in 
+    assignment specification.
+    See the Assignment Details page for full information.
+    '''
+    while True:
+        book_string = input('Please enter your book list: ') # Enter books
+    
+        # Checking if input above is above the required 50 characters
+        if len(book_string) < 50:
+            print('Your book list is too short, please enter at least 50 characters. ')
+            continue
+        break
+
+    books = make_book_list(book_string)
+    
+    # Build index
+    title_index = make_index(books, 1)
+    subtitle_index = make_index(books, 2)
+    
+    # User will select from the following 5 options
+    while True: 
+        
+        menu = input( 
+        '\nPlease enter an instruction from the list below:\n'
+        '\n1. Get average title length\n'
+        '2. Count word occurences in titles and subtitles\n'
+        '3. Searh for a word in titles\n'
+        '4. Search for a word in subtitles\n'
+        '5. Exit from program\n\n'
+    )
+        # if statements will direct user to the necessary function
+        # 1. Average title length 
+        if menu == '1':
+            
+            avg = title_length(books)
+            print(f"The average title length is {avg}")
+        
+        # 2. Word occurence
+        elif menu == '2':
+            
+            selected_word = input('Please enter the word to search for:\t')
+            count = word_occurrences(books, selected_word)
+            print(f'The word {selected_word} occurs {count} times in the collection')
+        
+        # 3. Search word in title
+        elif menu == '3':
+            
+            selected_word = input('Please enter the word to search for:\t')
+            lines = search_word(books, title_index, selected_word)
+            if lines:
+                print(f"The word '{selected_word}' occurs in the title of the following document titles:")
+                print(lines)
+            else:
+                print(f"The word '{selected_word}' does not appear in the title of any book in the collection.")
+        
+        # 4. Search word in subtitle       
+        elif menu == '4':
+            selected_word = input('Please enter the word to search for:\t')
+            lines = search_word(books, subtitle_index, selected_word)
+            if lines:
+                print(f"The word '{selected_word}' occurs in the title of the following document subtitles:")
+                print(lines)
+            else:
+                print(f"The word '{selected_word}' does not appear in the subtitle of any book in the collection.")
+
+        # 5. Exit program
+        elif menu == '5':
+            print('\nGoodbye.')
+            break
+        
+        else:
+            continue
+  interact()      
