@@ -1,0 +1,4 @@
+This repository is a copy of Reigner Casangcapan's Python work. 
+
+1. Interactive Data Processing Application is a very basic app for a library system. v2 does not change the code whatsoever - only edits the comments.
+2. 
