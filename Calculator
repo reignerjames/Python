@@ -1,0 +1,56 @@
+'''
+BASIC CALCULATOR
+'''
+
+# Try
+# While Loop
+# If Statement
+
+while True:
+    try:
+        num1 = int(input('\nFirst number: '))
+        break
+    except ValueError:
+        print("Require an Integer.")
+        
+while True:
+    try:
+        num2 = int(input('Second number: '))
+        break
+    except ValueError:
+        print("Require an Integer.")
+
+while True:
+    
+    menu = input(
+        "\nSelect an arithmetic operator: \n"
+        "\n1. Addition"
+        "\n2. Subtraction"
+        "\n3. Division"
+        "\n4. Multiplication"
+        "\n5. Cancel\n\n"
+        "=>\t"
+    )
+
+    # Ensure menu == '' a string
+    if menu == '1':
+        Addition = num1 + num2
+        print(f"Addition: {Addition}")
+        
+    elif menu == '2':
+        Subtraction = num1 - num2
+        print(f"Subtraction: {Subtraction}")
+
+    elif menu == '3':
+        Division = num1 / num2
+        print(f"Division: {Division}")
+        
+    elif menu == '4':
+        Multiplication = num1 * num2
+        print(f"Multiplication: {Multiplication}\n")
+        
+    elif menu == '5':
+        break
+
+    else: 
+        print("\nEnter valid option from the menu")
