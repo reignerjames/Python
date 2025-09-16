@@ -18,7 +18,6 @@ if not isinstance(student_name, str):
 # When the tracer is True, ensure rendering of drawing is at its fastest
 speed("fastest")
 
-
 cell_side = 60  # pixels
 
 # Define the overall size of our "flat top" hexagonal grid
