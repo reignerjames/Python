@@ -1,0 +1,22 @@
+from sqlite3 import *
+
+'''
+1. Create a connection to the database
+2. Get local view of database
+3. Execute SQL script. Query in this case.
+4. Fetch and print list of ... returned
+5. Close database
+'''
+
+connection = connect(database = 'superheroes.db')
+superheroes_db = connection.cursor()
+
+superheroes_db.execute('''SELECT superhero, secret_identity
+                            FROM identities
+                            ORDER BY superhero ASC''')
+
+for hero, identity in superheroes_db.fetchall():
+    print(hero + ' (' + identity + ')')
+    
+superheroes_db.close()
+connection.close()
